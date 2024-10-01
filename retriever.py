@@ -47,7 +47,7 @@ class Retriever:
         text_ser = pd.read_pickle(fcontent)
         n = len(text_ser)
         text_ser.drop(text_ser[text_ser.str.len() < ng_min].index, inplace=True)
-        print(f'{n} documents loaded, {(n-len(text_ser))/n*100}% were dropped because they are shorter than ng_min')
+        print(f'{n} documents loaded, {(n-len(text_ser))/n*100}% were dropped because they are shorter than ng_min', file=sys.stderr)
 
         index = gaoya.minhash.MinHashStringIndex(hash_size=32, 
                                                      jaccard_threshold=0.5, 
@@ -58,7 +58,7 @@ class Retriever:
                                                      ngram_range=(ng_min,ng_max))
         
         index.par_bulk_insert_docs(text_ser.index, text_ser)
-        print(f'{len(text_ser)} documents added to index')
+        print(f'{len(text_ser)} documents added to index', file=sys.stderr)
         del text_ser
         self.index = index
         self.ng_min = ng_min
