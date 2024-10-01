@@ -90,17 +90,23 @@ class Retriever:
         qid and tid are query text and retrieved text identifiers, sim is their Jaccard similarity, text is the 
         retrieved text. 
         NB: It is recommended to use batches: 1K queries => 102ms, 10K queries => 955 ms
-        NB: only ASCI characters are supported currently.
-        NB: texts containing less than ng_min ASCII are not index or queried because they become an empty set of ngrams
+        NB: texts containing less than ng_min letters are not indexed or queried because they become an empty set of ngrams
         """
+        start_line_num = 1
         with sys.stdin if finp=='-' else zstandard.open(finp,'r') as inp:
             while True:
                 st = time()
                 df = pd.read_json(inp, nrows=batch_size, lines=True)
+                if len(df)==0: break  # EOF
+                if finp != '-':
+                    df['qid'] = f'{finp}:' + (df.index + start_line_num).astype(str)
+                    start_line_num += len(df)
+                else:
+                    df = df[['index','text']].rename(columns={'index':'qid'})
+
                 dur1 = time() - st
-                if len(df)==0: break
                 st = time()
-                self._retrieve(df[['index','text']].rename(columns={'index':'qid'}))
+                self._retrieve(df)
                 dur2 = time() - st
                 print(f"{dur1+dur2}s per batch of {batch_size} docs, {dur1/dur2}x longer reading than searching", file=sys.stderr)
 
