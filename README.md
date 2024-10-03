@@ -1,7 +1,14 @@
 # minhash-retrieval
 Finds your documents in the HPLT datasets. 
-Inputs: your documents should be stored in the jsonl format with fields ```article```, ```headline```.
+
+**Inputs**: your documents should be stored in the jsonl format with fields ```article```, ```headline```.
 Each document will be added to the index twice: with and without the headline. Then each HPLT document will be searched in the index.
+
+**Outputs**: jsonl with the following informations for each near-match:
+* qid: file path and line number (starting from 1) identifying an HPLT document
+* tid: line number (starting from 1) identifying your document in the input json, or negated line number
+* sim: Jaccard simliarity
+* text: text of the retrieved HPLT document
 
 # Dependencies
 See [environment on NIRD](requirements_nird.lock)
