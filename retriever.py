@@ -47,7 +47,7 @@ class Retriever:
         text_ser = pd.read_pickle(fcontent)
         n = len(text_ser)
         text_ser.drop(text_ser[text_ser.str.len() < ng_min].index, inplace=True)
-        print(f'{n} documents loaded, {(n-len(text_ser))/n*100}% were dropped because they are shorter than ng_min', file=sys.stderr)
+        print(f'{n} documents loaded, {(n-len(text_ser))/n*100}% were dropped because they are shorter than ng_min={ng_min} chars', file=sys.stderr)
 
         index = gaoya.minhash.MinHashStringIndex(hash_size=32, 
                                                      jaccard_threshold=0.5, 
@@ -75,6 +75,8 @@ class Retriever:
         qser.drop(short_mask, inplace=True)
         qdf.drop(short_mask, inplace=True)
         res = self.index.par_bulk_query(qser, return_similarity=True)
+        if not any(r for r in res):
+            return
         qdf['ans'] = res
         qdf = qdf.explode(column='ans', ignore_index=True)
         qdf.dropna(inplace=True)
@@ -108,7 +110,7 @@ class Retriever:
                 st = time()
                 self._retrieve(df)
                 dur2 = time() - st
-                print(f"{dur1+dur2}s per batch of {batch_size} docs, {dur1/dur2}x longer reading than searching", file=sys.stderr)
+                print(f"{dur1+dur2}s per batch of {len(df)} docs, {dur1/dur2}x longer reading than searching", file=sys.stderr)
 
 
 
