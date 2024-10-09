@@ -96,11 +96,8 @@ class Retriever:
         start_line_num = 1
         with sys.stdin if finp=='-' else zstandard.open(finp,'r') as inp:
             while True:
-                import pdb
-                pdb.set_trace()
- 
                 st = time()
-                df = pd.read_json(inp, nrows=batch_size, lines=True, orient='records', dtype=False)
+                df = pd.read_json(inp, nrows=batch_size, lines=True, orient='records', dtype=False)  # dtype=False loads text correctly, otherwise tries infers float/int types sometimes
                 if len(df)==0: break  # EOF
                 if text_field != 'text':
                     df.rename(columns={text_field:'text'}, inplace=True)
