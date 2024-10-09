@@ -20,7 +20,7 @@ fixed.jsonl.preproc.pkl is dumped to disk, your docuemnts will be read from this
 
 # Retrieval
 For search in the deduplicate/cleaned versions of data release 2:
-```./run_retrieval1.sh fixed.jsonl.preproc.pkl deduplicated/ ./fixed-in-deduplicated-run2```
+```./run_retrieval1.sh fixed.jsonl.preproc.pkl deduplicated/ ./tmp text '*.zst'```
 For search in the outputs of stage2 of data release 2:
 ```./run_retrieval1.sh fixed.jsonl.preproc.pkl _stage2out/ ./fixed-in-stage2out t text.zst```
 
