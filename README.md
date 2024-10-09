@@ -19,5 +19,9 @@ Assume your documents are stored in fixed.jsonl. Preprocessing removes all non-l
 fixed.jsonl.preproc.pkl is dumped to disk, your docuemnts will be read from this file during retrieval
 
 # Retrieval
+For search in the deduplicate/cleaned versions of data release 2:
 ```./run_retrieval1.sh fixed.jsonl.preproc.pkl deduplicated/ ./fixed-in-deduplicated-run2```
+For search in the outputs of stage2 of data release 2:
+```./run_retrieval1.sh fixed.jsonl.preproc.pkl _stage2out/ ./fixed-in-stage2out t text.zst```
+
 This creates a MinHash index and puts docuemnts form fixed.jsonl.preproc.pkl there. Then retreives near-duplicates for HPLT docuemnts stored in deduplicated/. The outputs are dumped to the folder /fixed-in-deduplicated-run2
