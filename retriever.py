@@ -68,24 +68,23 @@ class Retriever:
         """
         qdf: a DataFrame with 2 columns: 'qid' and 'text'
         """
-#        import pdb
-#        pdb.set_trace()
+        if len(qdf) == 0: return
         qser = self._preprocess(qdf.text)
         short_mask = qdf[qser.str.len() < self.ng_min].index
         qser.drop(short_mask, inplace=True)
         qdf.drop(short_mask, inplace=True)
         res = self.index.par_bulk_query(qser, return_similarity=True)
         if not any(r for r in res):
-            return
+            return  # optimization fot the case of no matches
         qdf['ans'] = res
-        qdf = qdf.explode(column='ans', ignore_index=True)
-        qdf.dropna(inplace=True)
+        qdf = qdf.explode(column='ans', ignore_index=True)  # lists of answers to 1 answer per row
+        qdf.dropna(subset='ans', inplace=True)  # empty lists of answers
         qdf['tid'], qdf['sim'] = qdf.ans.str[0], qdf.ans.str[1]
         if len(qdf) > 0:
             qdf[['qid','tid','sim','text']].to_json(out, orient='records',lines=True)
         
         
-    def retrieve(self, finp='-', batch_size=10000):
+    def retrieve(self, finp='-', batch_size=10000, text_field='text'):
         """
         Retrieve near-duplicated of texts from stdin (by default) or file. 
         For each query text finds similar texts in the index, prints (qid, tid, sim, text) to stdout, where
@@ -97,20 +96,25 @@ class Retriever:
         start_line_num = 1
         with sys.stdin if finp=='-' else zstandard.open(finp,'r') as inp:
             while True:
+                import pdb
+                pdb.set_trace()
+ 
                 st = time()
-                df = pd.read_json(inp, nrows=batch_size, lines=True)
+                df = pd.read_json(inp, nrows=batch_size, lines=True, orient='records', dtype=False)
                 if len(df)==0: break  # EOF
+                if text_field != 'text':
+                    df.rename(columns={text_field:'text'}, inplace=True)
                 if finp != '-':
                     df['qid'] = f'{finp}:' + (df.index + start_line_num).astype(str)
                     start_line_num += len(df)
                 else:
                     df = df[['index','text']].rename(columns={'index':'qid'})
-
+                df.dropna(subset='text', inplace=True)
                 dur1 = time() - st
                 st = time()
                 self._retrieve(df)
                 dur2 = time() - st
-                print(f"{dur1+dur2}s per batch of {len(df)} docs, {dur1/dur2}x longer reading than searching", file=sys.stderr)
+                print(f"{dur1+dur2}s per batch of {batch_size} docs, {len(df)} queries after filtering, {dur1/dur2}x longer reading than searching", file=sys.stderr)
 
 
 
