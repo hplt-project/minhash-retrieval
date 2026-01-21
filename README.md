@@ -1,6 +1,5 @@
 # minhash-retrieval
-Finds your documents in the HPLT datasets. This tool was developed specifically for creation of the [UCDP Ab-
-stractive Event analysis Corpus](https://aclanthology.org/2025.konvens-2.8/), therefore has some limitations:
+Finds your documents in the HPLT datasets. This tool was developed specifically for creation of the [UCDP Abstractive Event analysis Corpus](https://aclanthology.org/2025.konvens-2.8/), therefore has some limitations:
 -  hyperparameters are hard-coded and selected based on general considerations to optimize recall,
 -  not tested for languages other than English, especially preprocessing may require modifications when applied to non-latin scripts.
 
