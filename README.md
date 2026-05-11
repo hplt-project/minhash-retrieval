@@ -5,6 +5,8 @@ This tool was developed specifically for creation of the [UCDP Abstractive Event
 - hyperparameters are hard-coded and selected based on general considerations to optimize recall;
 - not tested for languages other than English, preprocessing may require modifications for non-Latin scripts.
 
+The code in this directory was written for HPLTv2. To work with HPLTv4, refer to the [four](four/) directory.
+
 ## Input/Output Format
 
 ### Input Requirements
